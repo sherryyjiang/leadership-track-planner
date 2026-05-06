@@ -31,10 +31,12 @@ import { Input } from "@/components/ui/input";
 import {
   HOLDING_SLOT_ID,
   createPlannerHistory,
+  createScheduleSlotForSession,
   createDraftSession,
   getChangedSessionIds,
   getChangedSlotIds,
   getDeletedSessionIds,
+  getDeletedSlotIds,
   getMissingFields,
   getPlannerSnapshotSignature,
   isBreakSlot,
@@ -56,6 +58,11 @@ import {
 
 type PlannerActions = {
   addSession: (slotId: string) => void;
+  createSlotForSession: (
+    sessionId: string,
+    slot: { timeBlock: string; label?: string },
+  ) => void;
+  deleteSlot: (slotId: string) => void;
   deleteSession: (sessionId: string) => void;
   moveSession: (sessionId: string, slotId: string) => void;
   reset: () => void;
@@ -138,13 +145,25 @@ function ConvexPlanner() {
   const resetToSeed = useMutation(api.sessions.resetToSeed);
   const createSlot = useMutation(api.slots.create);
   const updateSlotMutation = useMutation(api.slots.update);
+  const deleteSlot = useMutation(api.slots.remove);
   const resetSlotsToSeed = useMutation(api.slots.resetToSeed);
 
   useEffect(() => {
-    if (sessions && sessions.length === 0) {
+    if (
+      sessions &&
+      seededSessions.some(
+        (seedSession) =>
+          !sessions.some((session) => session.id === seedSession.id),
+      )
+    ) {
       void seedDefaults();
     }
-    if (slots && slots.length === 0) {
+    if (
+      slots &&
+      scheduleSlots.some(
+        (seedSlot) => !slots.some((slot) => slot.id === seedSlot.id),
+      )
+    ) {
       void seedSlotDefaults();
     }
   }, [seedDefaults, seedSlotDefaults, sessions, slots]);
@@ -167,10 +186,16 @@ function ConvexPlanner() {
             .map((session) => session.id) ?? [];
 
         const existingSlotIds = new Set(slots?.map((slot) => slot.id) ?? []);
+        const draftSlotIds = new Set(draftSlots.map((slot) => slot.id));
+        const deletedSlotIds =
+          slots
+            ?.filter((slot) => !draftSlotIds.has(slot.id))
+            .map((slot) => slot.id) ?? [];
 
         await Promise.all(
           [
             ...deletedIds.map((clientId) => deleteSession({ clientId })),
+            ...deletedSlotIds.map((clientId) => deleteSlot({ clientId })),
             ...draftSessions.map((session) => {
               if (!existingIds.has(session.id)) {
                 return createSession({
@@ -325,12 +350,19 @@ function PlannerBoard({
     () => getChangedSlotIds(slots, draftSlots),
     [slots, draftSlots],
   );
+  const deletedSlotIds = useMemo(
+    () => getDeletedSlotIds(slots, draftSlots),
+    [slots, draftSlots],
+  );
   const deletedIds = useMemo(
     () => getDeletedSessionIds(sessions, draftSessions),
     [sessions, draftSessions],
   );
   const unsavedChangeCount =
-    changedIds.length + deletedIds.length + changedSlotIds.length;
+    changedIds.length +
+    deletedIds.length +
+    changedSlotIds.length +
+    deletedSlotIds.length;
   const hasUnsavedChanges = unsavedChangeCount > 0;
   const holdingSessions = draftSessions.filter(
     (session) => session.slotId === HOLDING_SLOT_ID,
@@ -429,6 +461,26 @@ function PlannerBoard({
         };
       });
     },
+    createSlotForSession: (sessionId, slot) => {
+      commitSnapshot((current) =>
+        createScheduleSlotForSession(
+          current.sessions,
+          current.slots,
+          sessionId,
+          {
+            id: `slot-${sessionId}`,
+            timeBlock: slot.timeBlock,
+            label: slot.label,
+          },
+        ),
+      );
+    },
+    deleteSlot: (slotId) => {
+      commitSnapshot((current) => ({
+        ...current,
+        slots: current.slots.filter((slot) => slot.id !== slotId),
+      }));
+    },
     deleteSession: (sessionId) => {
       commitSnapshot((current) => ({
         ...current,
@@ -511,7 +563,7 @@ function PlannerBoard({
               </h1>
               <p className="mt-2 max-w-[min(42rem,calc(100vw-2rem))] break-words text-sm leading-6 text-zinc-400">
                 Working agenda for case studies, tool perspectives, and the
-                action lab.
+                peer discussion.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -640,6 +692,9 @@ function PlannerBoard({
                     setDraggingId={setDraggingId}
                     onDrop={handleDrop}
                     actions={actions}
+                    canDeleteSlot={!scheduleSlots.some(
+                      (seedSlot) => seedSlot.id === slot.id,
+                    )}
                   />
                 );
               })}
@@ -769,6 +824,7 @@ function ScheduleSlotRows({
   setDraggingId,
   onDrop,
   actions,
+  canDeleteSlot,
 }: {
   slot: ScheduleSlot;
   sessions: PlannerSession[];
@@ -776,6 +832,7 @@ function ScheduleSlotRows({
   setDraggingId: (id: string | null) => void;
   onDrop: (slotId: string, sessionId: string) => void;
   actions: PlannerActions;
+  canDeleteSlot: boolean;
 }) {
   const isBreak = isBreakSlot(slot);
 
@@ -794,11 +851,19 @@ function ScheduleSlotRows({
           <TimeCell slot={slot} actions={actions} />
           <button
             type="button"
-            className="col-span-5 rounded-md border border-dashed border-white/15 px-3 py-5 text-left text-sm text-zinc-500 hover:border-cyan-300/50 hover:text-zinc-200"
+            className="col-span-4 rounded-md border border-dashed border-white/15 px-3 py-5 text-left text-sm text-zinc-500 hover:border-cyan-300/50 hover:text-zinc-200"
             onClick={() => actions.addSession(slot.id)}
           >
             Drop a session here or click to add one.
           </button>
+          {canDeleteSlot ? (
+            <DeleteButton
+              label={`Delete ${slot.label || "empty slot"}`}
+              onDelete={() => actions.deleteSlot(slot.id)}
+            />
+          ) : (
+            <div />
+          )}
         </div>
       ) : (
         sessions.map((session, index) => (
@@ -806,7 +871,7 @@ function ScheduleSlotRows({
             key={session.id}
             slot={slot}
             session={session}
-            showTimeCell={index === 0}
+            timeCellMode={index === 0 ? "slot" : "split"}
             setDraggingId={setDraggingId}
             actions={actions}
           />
@@ -819,13 +884,13 @@ function ScheduleSlotRows({
 function SessionRow({
   slot,
   session,
-  showTimeCell,
+  timeCellMode,
   setDraggingId,
   actions,
 }: {
   slot: ScheduleSlot;
   session: PlannerSession;
-  showTimeCell: boolean;
+  timeCellMode: "slot" | "split";
   setDraggingId: (id: string | null) => void;
   actions: PlannerActions;
 }) {
@@ -845,7 +910,11 @@ function SessionRow({
         isBreak ? "border-l-2 border-l-amber-300/60 bg-amber-300/[0.035]" : "",
       ].join(" ")}
     >
-      {showTimeCell ? <TimeCell slot={slot} actions={actions} /> : <div />}
+      {timeCellMode === "slot" ? (
+        <TimeCell slot={slot} actions={actions} />
+      ) : (
+        <SplitTimeCell session={session} actions={actions} />
+      )}
       {isBreak ? (
         <div className="col-span-4">
           <EditableField
@@ -1126,6 +1195,32 @@ function TimeCell({ slot, actions }: { slot: ScheduleSlot; actions: PlannerActio
           isBreak ? "border-amber-300/20 text-amber-200" : "border-white/10",
         ].join(" ")}
       />
+    </div>
+  );
+}
+
+function SplitTimeCell({
+  session,
+  actions,
+}: {
+  session: PlannerSession;
+  actions: PlannerActions;
+}) {
+  return (
+    <div className="space-y-1 pr-3">
+      <Input
+        value=""
+        aria-label={`Add time block for ${session.sessionName || "session"}`}
+        placeholder="Add time"
+        onChange={(event) => {
+          actions.createSlotForSession(session.id, {
+            timeBlock: event.target.value,
+            label: "Session",
+          });
+        }}
+        className="h-8 border border-dashed border-cyan-300/40 bg-[#111315] px-2 font-mono text-sm text-zinc-100 placeholder:text-cyan-200/60"
+      />
+      <div className="px-2 text-xs text-zinc-600">Separate slot</div>
     </div>
   );
 }

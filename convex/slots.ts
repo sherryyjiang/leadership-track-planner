@@ -34,10 +34,10 @@ export const list = query({
 export const seedDefaults = mutation({
   args: {},
   handler: async (ctx) => {
-    const existing = await ctx.db.query("slots").take(1);
-    if (existing.length > 0) return;
-
     for (const slot of scheduleSlots) {
+      const existing = await findByClientId(ctx, slot.id);
+      if (existing) continue;
+
       await ctx.db.insert("slots", {
         clientId: slot.id,
         order: slot.order,
@@ -76,6 +76,18 @@ export const update = mutation({
     if (!slot) return;
 
     await ctx.db.patch(slot._id, patch);
+  },
+});
+
+export const remove = mutation({
+  args: {
+    clientId: v.string(),
+  },
+  handler: async (ctx, { clientId }) => {
+    const slot = await findByClientId(ctx, clientId);
+    if (!slot) return;
+
+    await ctx.db.delete(slot._id);
   },
 });
 

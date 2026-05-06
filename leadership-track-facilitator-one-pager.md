@@ -1,6 +1,6 @@
 # AI Engineer Singapore Leadership Track: Facilitator One-Pager
 
-We are looking for a small number of senior facilitators to support the final 90-minute working session of the AI Engineer Singapore Leadership Track. The main facilitation and session design will be led internally by Sherry and the AI Engineer team; we likely need 2 additional facilitators to help guide small-group discussions.
+We are looking for a small number of senior facilitators to support the final 60-minute peer discussion and wrap-up of the AI Engineer Singapore Leadership Track. The main facilitation and session design will be led internally by Sherry and the AI Engineer team; we likely need 2 additional facilitators to help guide small-group discussions.
 
 ## What Is AI Engineer Singapore?
 
@@ -39,15 +39,15 @@ The agenda is still being finalized. The working structure is a mix of real-worl
 - 10:30-11:00 - Morning break.
 - 11:00-12:30 - More case studies and applied sessions, including possible OpenAI / Codex and Cursor perspectives.
 - 12:30-1:30 - Lunch.
-- 1:30-3:00 - Practical sessions on pilot-to-production, evals, agent operations, and AI workflow deployment, with possible sessions from Cognition, Arize, and others.
-- 3:00-3:30 - Afternoon break.
-- 3:30-5:00 - Facilitated leadership working session and closing reflections.
+- 1:30-3:30 - Practical sessions on pilot-to-production, evals, agent operations, and AI workflow deployment, with possible sessions from Cognition, Arize, and others.
+- 3:30-4:00 - Afternoon break.
+- 4:00-5:00 - Facilitated peer discussion and brief wrap-up.
 
 Working speaker / topic examples include real-world case studies from builders such as Darius / 99.co and Jeff Pan / Belli, pilot-to-production perspectives from Cursor, Cognition, and OpenAI, and evals / production feedback-loop content from Arize.
 
 ## Facilitation Goal
 
-The 90-minute closing session should make the day meaningfully different from passive conference attendance. We want participants to synthesize what they learned, compare notes with peers, and leave with sharper insights from the people in the room.
+The 60-minute closing discussion should make the day meaningfully different from passive conference attendance. We want participants to synthesize what they learned, compare notes with peers, and leave with sharper insights from the people in the room. The final wrap-up should be brief, roughly five minutes.
 
 The working format is to divide attendees into groups of roughly 20-30, segmented either by company type / stage, such as startup, enterprise, public sector, regulated industry, AI-native builder, or by problem statement, such as ROI, org design, governance, evals, production operations, and adoption.
 
@@ -68,6 +68,6 @@ After the session, facilitators will share quick notes with the AI Engineer team
 - Community connections with AI engineers, founders, operators, and senior leaders across Singapore and APAC.
 - Relevant introductions to conference guests where there is a strong fit.
 - Access to leadership-session registration context for the group they are facilitating, where appropriate.
-- Proposed honorarium: $500 per facilitator for the 90-minute session plus briefing.
+- Proposed honorarium: $500 per facilitator for the 60-minute session plus briefing.
 
 Sources / planning references: https://www.ai.engineer/singapore, https://www.65labs.org/newsroom/ai-engineer-singapore-first-asia-edition, and internal Notion planning notes for the AI Engineer Singapore Leadership Track.

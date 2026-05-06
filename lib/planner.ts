@@ -90,31 +90,31 @@ export const scheduleSlots: ScheduleSlot[] = [
     kind: "session",
   },
   {
-    id: "slot-arize",
+    id: "slot-cognition",
     order: 8,
     timeBlock: "2:00-2:30pm",
-    label: "Evals",
-    kind: "session",
-  },
-  {
-    id: "slot-cognition",
-    order: 9,
-    timeBlock: "2:30-3:00pm",
     label: "Agents at scale",
     kind: "session",
   },
   {
-    id: "slot-action-lab",
-    order: 10,
-    timeBlock: "3:00-4:30pm",
-    label: "Action lab",
+    id: "slot-arize",
+    order: 9,
+    timeBlock: "2:30-3:00pm",
+    label: "Evals",
     kind: "session",
   },
   {
-    id: "slot-closing",
+    id: "slot-afternoon-break",
+    order: 10,
+    timeBlock: "3:30-4:00pm",
+    label: "Break",
+    kind: "break",
+  },
+  {
+    id: "slot-action-lab",
     order: 11,
-    timeBlock: "4:30-5:00pm",
-    label: "Closing",
+    timeBlock: "4:00-5:00pm",
+    label: "Peer discussion",
     kind: "session",
   },
 ];
@@ -203,55 +203,54 @@ export const seededSessions: PlannerSession[] = [
     id: "jimmy-lai",
     slotId: "slot-jimmy",
     order: 0,
-    sessionName: "Make your organization work for agents",
-    company: "",
+    sessionName: "Building the Agent-Ready Development Organization",
+    company: "Vercel",
     speaker: "Jimmy Lai",
     details:
-      "Agent implementation at scale and how to structure teams around agents. Strong post-lunch concrete topic.",
+      "As engineering leaders move from AI-assisted coding experiments toward agentic software development, the hard question is no longer whether agents can write useful code. It is how teams organize codebases, developer workflows, and ownership models so agents can operate reliably inside real engineering organizations. In this session, Jimmy Lai, who leads the Next.js and Turbopack teams at Vercel after earlier work across Meta and React Native, will frame what it means for an engineering org to become agent-ready. The discussion will explore how leaders should think about repo structure, framework choices, build systems, internal tooling, review loops, and team norms before asking agents to take on more meaningful work. Drawing from Vercel's role shaping the modern web stack through Next.js, Turbopack, and the AI SDK, the session gives leaders a practical Monday-morning lens on how to prepare their developers, architecture, and workflows for a world where agents become active participants in the software delivery process.",
     source: "seed",
   },
   {
     id: "arize-evals",
     slotId: "slot-arize",
     order: 0,
-    sessionName: "Evals",
+    sessionName: "Evaluating Agentic Systems in Production",
     company: "Arize",
     speaker: "",
     details:
-      "Practical evals talk for leaders moving from tools and case studies into measurement, reliability, and production feedback loops.",
+      "As organizations put AI systems and agents into production, leaders need a clearer answer to a deceptively simple question: how do we know this is actually working? This session closes the afternoon with the governance and accountability layer that makes agent adoption sustainable. Arize will focus on how evaluation becomes part of the production operating system for AI applications, moving beyond one-off prompt tests into continuous measurement, reliability tracking, feedback loops, and operational decision-making. The discussion will explore why the bottleneck is shifting from model quality alone to system reliability, how teams can evaluate agent behavior across messy real-world workflows, and what engineering leaders should expect from eval infrastructure as AI becomes embedded in customer-facing and internal processes. Attendees will leave with a more mature framework for measuring quality, diagnosing failures, comparing changes over time, and giving executives the confidence that agentic systems are improving in ways that can be governed, trusted, and scaled.",
     source: "seed",
   },
   {
     id: "cognition",
     slotId: "slot-cognition",
     order: 0,
-    sessionName: "Cognition",
+    sessionName: "Running Background Agents at Enterprise Scale",
     company: "Cognition",
     speaker: "",
     details:
-      "Cloud/background agents at enterprise scale. Anchors the tool-company portion of the day with a forward-looking product vision.",
+      "Once teams understand what it takes to become agent-ready, the next question is what happens when agents begin operating as persistent cloud workers rather than occasional coding assistants. In this session, Cognition will share how background agents change the management model for engineering work, from scoping and delegation to review, scheduling, and accountability. Drawing on Devin's evolution and enterprise deployments with organizations such as Goldman Sachs, Santander, and Nubank, the talk will examine what leaders can learn from managing agents as teammates: how to assign work, supervise progress, integrate results into existing engineering workflows, and decide which tasks should run in the background. The discussion will also cover newer patterns such as recurring agent sessions and managed sub-agents, raising the stakes from individual productivity gains to coordinated agent operations in the cloud. For CTOs and engineering executives, this is the frontier deployment session: a view into what agentic software development looks like when it becomes an operating model, not just a tool.",
+    source: "seed",
+  },
+  {
+    id: "afternoon-break",
+    slotId: "slot-afternoon-break",
+    order: 0,
+    sessionName: "Afternoon Break",
+    company: "",
+    speaker: "",
+    details: "",
     source: "seed",
   },
   {
     id: "action-lab",
     slotId: "slot-action-lab",
     order: 0,
-    sessionName: "Leadership Action Lab",
+    sessionName: "Peer Discussion & Wrap-Up",
     company: "AI Engineer",
     speaker: "Facilitators TBD",
     details:
-      "Facilitated roundtables where attendees cluster around themes, work through a framework, and leave with an implementation playbook or 90-day action plan.",
-    source: "seed",
-  },
-  {
-    id: "closing",
-    slotId: "slot-closing",
-    order: 0,
-    sessionName: "Closing: Sharebacks & Takeaways",
-    company: "AI Engineer",
-    speaker: "Sherry Jiang",
-    details:
-      "Groups share their top insight or commitment. Sherry wraps with key themes so people leave with something they made, not just something they heard.",
+      "Facilitated peer discussion where attendees compare notes, surface practical next steps, and close with a final five-minute wrap-up from Sherry.",
     source: "seed",
   },
   {
@@ -440,6 +439,50 @@ export function getDeletedSessionIds(
   return savedSessions
     .filter((session) => !draftIds.has(session.id))
     .map((session) => session.id);
+}
+
+export function getDeletedSlotIds(
+  savedSlots: ScheduleSlot[],
+  draftSlots: ScheduleSlot[],
+): string[] {
+  const draftIds = new Set(draftSlots.map((slot) => slot.id));
+  return savedSlots
+    .filter((slot) => !draftIds.has(slot.id))
+    .map((slot) => slot.id);
+}
+
+export function createScheduleSlotForSession(
+  sessions: PlannerSession[],
+  slots: ScheduleSlot[],
+  sessionId: string,
+  slotInput: {
+    id?: string;
+    timeBlock: string;
+    label?: string;
+  },
+): PlannerSnapshot {
+  const session = sessions.find((candidate) => candidate.id === sessionId);
+  const sourceSlot = session
+    ? slots.find((slot) => slot.id === session.slotId)
+    : undefined;
+  const slotId = slotInput.id ?? `slot-${sessionId}`;
+  const order = sourceSlot ? sourceSlot.order + 0.5 : slots.length;
+  const newSlot: ScheduleSlot = {
+    id: slotId,
+    order,
+    timeBlock: slotInput.timeBlock,
+    label: slotInput.label ?? "Session",
+    kind: "session",
+  };
+
+  return {
+    sessions: sessions.map((candidate) =>
+      candidate.id === sessionId
+        ? { ...candidate, slotId, order: 0 }
+        : candidate,
+    ),
+    slots: sortScheduleSlots([...slots, newSlot]),
+  };
 }
 
 export function createPlannerHistory(

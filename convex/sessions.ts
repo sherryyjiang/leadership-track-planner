@@ -40,10 +40,10 @@ export const list = query({
 export const seedDefaults = mutation({
   args: {},
   handler: async (ctx) => {
-    const existing = await ctx.db.query("sessions").take(1);
-    if (existing.length > 0) return;
-
     for (const session of seededSessions) {
+      const existing = await findByClientId(ctx, session.id);
+      if (existing) continue;
+
       await ctx.db.insert("sessions", {
         clientId: session.id,
         slotId: session.slotId,
