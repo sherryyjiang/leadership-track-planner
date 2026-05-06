@@ -13,27 +13,110 @@ export type PlannerSession = {
 
 export type ScheduleSlot = {
   id: string;
+  order: number;
   timeBlock: string;
   label: string;
+  kind: "session" | "break";
+};
+
+export type PlannerSnapshot = {
+  sessions: PlannerSession[];
+  slots: ScheduleSlot[];
+};
+
+export type PlannerHistory = {
+  past: PlannerSnapshot[];
+  present: PlannerSnapshot;
+  future: PlannerSnapshot[];
 };
 
 export type MissingField = "sessionName" | "company" | "speaker" | "details";
 
 export const scheduleSlots: ScheduleSlot[] = [
-  { id: "slot-opening", timeBlock: "8:45-9:00am", label: "Opening" },
-  { id: "slot-case-1", timeBlock: "9:00-9:30am", label: "Case study #1" },
-  { id: "slot-cursor", timeBlock: "9:30-10:30am", label: "Product talk" },
-  { id: "slot-morning-break", timeBlock: "10:30-11:00am", label: "Break" },
-  { id: "slot-case-2", timeBlock: "11:00-11:30am", label: "Case study #2" },
-  { id: "slot-openai", timeBlock: "11:30am-12:00pm", label: "Product talk" },
-  { id: "slot-panel", timeBlock: "12:00-12:30pm", label: "Panel" },
-  { id: "slot-lunch", timeBlock: "12:30-1:30pm", label: "Lunch" },
-  { id: "slot-jimmy", timeBlock: "1:30-2:00pm", label: "Implementation talk" },
-  { id: "slot-arize", timeBlock: "2:00-2:30pm", label: "Evals" },
-  { id: "slot-cognition", timeBlock: "2:30-3:00pm", label: "Agents at scale" },
-  { id: "slot-afternoon-break", timeBlock: "3:00-3:30pm", label: "Break" },
-  { id: "slot-action-lab", timeBlock: "3:30-4:30pm", label: "Action lab" },
-  { id: "slot-closing", timeBlock: "4:30-5:00pm", label: "Closing" },
+  {
+    id: "slot-opening",
+    order: 0,
+    timeBlock: "8:45-9:00am",
+    label: "Opening",
+    kind: "session",
+  },
+  {
+    id: "slot-jeff-belli",
+    order: 1,
+    timeBlock: "9:00-9:45am",
+    label: "Operator talk",
+    kind: "session",
+  },
+  {
+    id: "slot-cursor",
+    order: 2,
+    timeBlock: "9:45-10:30am",
+    label: "Product talk",
+    kind: "session",
+  },
+  {
+    id: "slot-morning-break",
+    order: 3,
+    timeBlock: "10:30-11:00am",
+    label: "Break",
+    kind: "break",
+  },
+  {
+    id: "slot-openai",
+    order: 4,
+    timeBlock: "11:00-11:45am",
+    label: "Product talk",
+    kind: "session",
+  },
+  {
+    id: "slot-99-group",
+    order: 5,
+    timeBlock: "11:45am-12:30pm",
+    label: "Operator talk",
+    kind: "session",
+  },
+  {
+    id: "slot-lunch",
+    order: 6,
+    timeBlock: "12:30-1:30pm",
+    label: "Lunch",
+    kind: "break",
+  },
+  {
+    id: "slot-jimmy",
+    order: 7,
+    timeBlock: "1:30-2:00pm",
+    label: "Implementation talk",
+    kind: "session",
+  },
+  {
+    id: "slot-arize",
+    order: 8,
+    timeBlock: "2:00-2:30pm",
+    label: "Evals",
+    kind: "session",
+  },
+  {
+    id: "slot-cognition",
+    order: 9,
+    timeBlock: "2:30-3:00pm",
+    label: "Agents at scale",
+    kind: "session",
+  },
+  {
+    id: "slot-action-lab",
+    order: 10,
+    timeBlock: "3:00-4:30pm",
+    label: "Action lab",
+    kind: "session",
+  },
+  {
+    id: "slot-closing",
+    order: 11,
+    timeBlock: "4:30-5:00pm",
+    label: "Closing",
+    kind: "session",
+  },
 ];
 
 export const seededSessions: PlannerSession[] = [
@@ -43,31 +126,33 @@ export const seededSessions: PlannerSession[] = [
     order: 0,
     sessionName: "Opening: Welcome to the Leadership Track",
     company: "AI Engineer",
-    speaker: "Sherry Jiang",
+    speaker: "AI Engineer Team",
     details:
-      "Frame the day's arc: alternate between what is possible from tool companies and how organizations actually shipped it. Set a grounded real-talk tone.",
+      "We will set the stage for a day that moves between real-world implementation stories, product and lab perspectives, practical operating topics like evals, and interactive peer discussion. Attendees will be invited to share the questions and pain points they want to work through, then use those inputs to connect with relevant peers and leave with clearer next questions, practical examples, and a better sense of what AI adoption can look like inside their own organizations.",
     source: "seed",
   },
   {
-    id: "case-study-1",
-    slotId: "slot-case-1",
+    id: "jeff-belli",
+    slotId: "slot-jeff-belli",
     order: 0,
-    sessionName: "Real World Case Study #1",
-    company: "",
-    speaker: "",
+    sessionName:
+      "From AI Hype to Operating Systems: Rebuilding the Modern Company with AI",
+    company: "Belli",
+    speaker: "Jeff Pan",
     details:
-      "Practitioner talk on deployed AI across a team or organization: what worked, what broke, and what they would do differently.",
+      "AI is forcing companies to rewrite nearly every traditional startup and enterprise playbook, from how teams are structured and hired to how products are built, evaluated, and scaled. In this session, Jeff Pan shares lessons from building Belli into an AI-native company internally: the workflows, operating principles, hiring approaches, and decision-making frameworks that helped the team move faster, along with the experiments that failed along the way. Drawing from both startup execution and enterprise deployments in the airline industry, he will unpack what it actually takes for organizations to move from AI pilots to production, including internal buy-in, operational resistance, governance, and deciding which initiatives to scale, kill, or rethink entirely. Attendees can expect a candid look at what is working in real-world AI transformation today.",
     source: "seed",
   },
   {
     id: "cursor",
     slotId: "slot-cursor",
     order: 0,
-    sessionName: "Cursor",
+    sessionName:
+      "Context Window Engineering: Deploying AI-Native Development Inside Real Organizations",
     company: "Cursor",
-    speaker: "",
+    speaker: "Nick Miller, Field Engineer",
     details:
-      "Product/demo talk positioned after a case study so the audience evaluates through a practical lens rather than just novelty.",
+      "As enterprises race to adopt AI-native development tools, many organizations are discovering that the challenge is no longer just access to models. It is redesigning how teams actually build, collaborate, and ship software. In this session, Cursor field engineer Nick Miller shares lessons from working directly with engineering organizations across Asia: how companies are integrating AI coding agents into production workflows, where adoption succeeds or breaks down, and the operational patterns emerging inside high-performing AI-native teams. Drawing from real customer implementations, he will unpack topics like context window engineering, AI-assisted workflows, flatter team structures, and why the most successful rollouts are often driven bottom-up by internal champions rather than top-down mandates. The session will also explore how organizations are rethinking ownership, engineering roles, onboarding, and internal operating playbooks as AI shifts software teams from writing code manually to supervising increasingly autonomous systems.",
     source: "seed",
   },
   {
@@ -75,42 +160,33 @@ export const seededSessions: PlannerSession[] = [
     slotId: "slot-morning-break",
     order: 0,
     sessionName: "Morning Break",
-    company: "AI Engineer",
-    speaker: "N/A",
-    details: "Coffee reset and hallway discussion.",
-    source: "seed",
-  },
-  {
-    id: "case-study-2",
-    slotId: "slot-case-2",
-    order: 0,
-    sessionName: "Real World Case Study #2",
     company: "",
     speaker: "",
-    details:
-      "Second practitioner story. Ideally a different industry or scale from the first case study.",
+    details: "",
     source: "seed",
   },
   {
-    id: "openai-codex",
+    id: "openai-operationalizing-ai",
     slotId: "slot-openai",
     order: 0,
-    sessionName: "OpenAI / Codex",
+    sessionName:
+      "From Experimentation to Execution: Operationalizing AI Inside Modern Organizations",
     company: "OpenAI",
-    speaker: "",
+    speaker: "Speaker from OpenAI",
     details:
-      "Product/demo talk. The case study to tool-company alternation keeps energy varied and prevents sponsor-showcase fatigue.",
+      "As organizations move beyond early AI experimentation, many teams are facing a new set of challenges: deciding which initiatives to scale or kill, integrating AI into measurable production workflows, and redesigning teams and operating models around increasingly autonomous systems. In this session, a speaker from OpenAI will share perspectives and lessons from organizations deploying AI systems in production, including common implementation patterns, operational bottlenecks, and the organizational shifts emerging as AI adoption expands beyond isolated innovation teams. The discussion will explore production readiness, governance and accountability, workflow selection, reliability and observability, human-AI collaboration, and how organizations are navigating the transition from pilots to long-term operational systems. Attendees can expect practical insight into the realities of AI deployment at scale, from adoption and internal enablement to questions around ownership, trust, evaluation, and sustaining organizational change as AI capabilities continue to evolve.",
     source: "seed",
   },
   {
-    id: "practitioner-panel",
-    slotId: "slot-panel",
+    id: "erwin-99-group",
+    slotId: "slot-99-group",
     order: 0,
-    sessionName: "Practitioner Panel",
-    company: "Multiple",
-    speaker: "",
+    sessionName:
+      "Doing More with Less: Building High-Leverage AI Teams Inside Real Organizations",
+    company: "99 Group (99.co)",
+    speaker: "Erwin Lee, Group CTO",
     details:
-      "Two to three leaders who have implemented AI at their organizations. Conversational pre-lunch format with practical takeaways.",
+      "As AI capabilities rapidly improve, one of the biggest challenges facing engineering leaders is no longer just shipping features. It is learning how to maximize output, efficiency, and organizational leverage without letting cost and complexity spiral out of control. In this session, Erwin Lee, Group CTO of 99 Group, will share practical lessons from leading engineering teams inside one of Southeast Asia's largest proptech platforms, including how teams are thinking about AI-native workflows, engineering productivity, organizational structure, and operational efficiency at scale. The discussion will explore maximizing output per engineering dollar, managing token and compute costs, deciding where AI meaningfully improves workflows versus where it creates overhead, and how mid-sized technology companies are evolving their operating playbooks in the AI era. Attendees can expect candid insights into the realities of deploying AI inside production organizations: balancing speed with reliability, identifying high-leverage internal use cases, and building teams that can move quickly without losing operational discipline.",
     source: "seed",
   },
   {
@@ -118,9 +194,9 @@ export const seededSessions: PlannerSession[] = [
     slotId: "slot-lunch",
     order: 0,
     sessionName: "Lunch Break",
-    company: "AI Engineer",
-    speaker: "N/A",
-    details: "Lunch and peer discussion.",
+    company: "",
+    speaker: "",
+    details: "",
     source: "seed",
   },
   {
@@ -157,16 +233,6 @@ export const seededSessions: PlannerSession[] = [
     source: "seed",
   },
   {
-    id: "afternoon-break",
-    slotId: "slot-afternoon-break",
-    order: 0,
-    sessionName: "Afternoon Break",
-    company: "AI Engineer",
-    speaker: "N/A",
-    details: "Coffee reset before the working session.",
-    source: "seed",
-  },
-  {
     id: "action-lab",
     slotId: "slot-action-lab",
     order: 0,
@@ -189,29 +255,9 @@ export const seededSessions: PlannerSession[] = [
     source: "seed",
   },
   {
-    id: "darius-99co",
-    slotId: HOLDING_SLOT_ID,
-    order: 0,
-    sessionName: "99.co implementation story",
-    company: "99.co",
-    speaker: "Darius",
-    details: "Candidate real-world case study from a builder/operator.",
-    source: "seed",
-  },
-  {
-    id: "jeff-belli",
-    slotId: HOLDING_SLOT_ID,
-    order: 1,
-    sessionName: "Belli implementation story",
-    company: "Belli",
-    speaker: "Jeff Pan",
-    details: "Candidate real-world case study for the practitioner arc.",
-    source: "seed",
-  },
-  {
     id: "governance-roundtable",
     slotId: HOLDING_SLOT_ID,
-    order: 2,
+    order: 0,
     sessionName: "Governance and risk operator talk",
     company: "",
     speaker: "",
@@ -222,7 +268,7 @@ export const seededSessions: PlannerSession[] = [
   {
     id: "roi-measurement",
     slotId: HOLDING_SLOT_ID,
-    order: 3,
+    order: 1,
     sessionName: "ROI and adoption measurement",
     company: "",
     speaker: "",
@@ -233,12 +279,24 @@ export const seededSessions: PlannerSession[] = [
 ];
 
 export function getMissingFields(session: PlannerSession): MissingField[] {
+  if (isBreakSession(session)) return [];
+
   const fields: MissingField[] = [];
   if (!session.sessionName.trim()) fields.push("sessionName");
   if (!session.company.trim()) fields.push("company");
   if (!session.speaker.trim()) fields.push("speaker");
   if (!session.details.trim()) fields.push("details");
   return fields;
+}
+
+export function isBreakSlot(slot: ScheduleSlot): boolean {
+  return slot.kind === "break";
+}
+
+export function isBreakSession(session: PlannerSession): boolean {
+  return scheduleSlots.some(
+    (slot) => isBreakSlot(slot) && slot.id === session.slotId,
+  );
 }
 
 export function getGapCounts(sessions: PlannerSession[]) {
@@ -293,9 +351,19 @@ export function moveSession(
   );
 }
 
-export function sortSessions(sessions: PlannerSession[]): PlannerSession[] {
+export function sortScheduleSlots(slots: ScheduleSlot[]): ScheduleSlot[] {
+  return [...slots].sort((a, b) => {
+    if (a.order !== b.order) return a.order - b.order;
+    return a.timeBlock.localeCompare(b.timeBlock);
+  });
+}
+
+export function sortSessions(
+  sessions: PlannerSession[],
+  slots: ScheduleSlot[] = scheduleSlots,
+): PlannerSession[] {
   const slotIndex = new Map(
-    scheduleSlots.map((slot, index) => [slot.id, index] as const),
+    sortScheduleSlots(slots).map((slot, index) => [slot.id, index] as const),
   );
 
   return [...sessions].sort((a, b) => {
@@ -305,6 +373,37 @@ export function sortSessions(sessions: PlannerSession[]): PlannerSession[] {
     if (a.order !== b.order) return a.order - b.order;
     return a.sessionName.localeCompare(b.sessionName);
   });
+}
+
+export function updateScheduleSlot(
+  slots: ScheduleSlot[],
+  slotId: string,
+  patch: Partial<Pick<ScheduleSlot, "timeBlock" | "label">>,
+): ScheduleSlot[] {
+  return slots.map((slot) =>
+    slot.id === slotId ? { ...slot, ...patch } : slot,
+  );
+}
+
+export function getChangedSlotIds(
+  savedSlots: ScheduleSlot[],
+  draftSlots: ScheduleSlot[],
+): string[] {
+  const savedById = new Map(savedSlots.map((slot) => [slot.id, slot] as const));
+
+  return draftSlots
+    .filter((draft) => {
+      const saved = savedById.get(draft.id);
+      if (!saved) return true;
+
+      return (
+        saved.order !== draft.order ||
+        saved.timeBlock !== draft.timeBlock ||
+        saved.label !== draft.label ||
+        saved.kind !== draft.kind
+      );
+    })
+    .map((slot) => slot.id);
 }
 
 export function getChangedSessionIds(
@@ -341,4 +440,81 @@ export function getDeletedSessionIds(
   return savedSessions
     .filter((session) => !draftIds.has(session.id))
     .map((session) => session.id);
+}
+
+export function createPlannerHistory(
+  initialSnapshot: PlannerSnapshot,
+): PlannerHistory {
+  return {
+    past: [],
+    present: initialSnapshot,
+    future: [],
+  };
+}
+
+export function pushPlannerHistory(
+  history: PlannerHistory,
+  nextSnapshot: PlannerSnapshot,
+): PlannerHistory {
+  if (
+    getPlannerSnapshotSignature(history.present) ===
+    getPlannerSnapshotSignature(nextSnapshot)
+  ) {
+    return history;
+  }
+
+  return {
+    past: [...history.past, history.present],
+    present: nextSnapshot,
+    future: [],
+  };
+}
+
+export function undoPlannerHistory(history: PlannerHistory): PlannerHistory {
+  const previous = history.past.at(-1);
+  if (!previous) return history;
+
+  return {
+    past: history.past.slice(0, -1),
+    present: previous,
+    future: [history.present, ...history.future],
+  };
+}
+
+export function redoPlannerHistory(history: PlannerHistory): PlannerHistory {
+  const next = history.future[0];
+  if (!next) return history;
+
+  return {
+    past: [...history.past, history.present],
+    present: next,
+    future: history.future.slice(1),
+  };
+}
+
+export function replacePlannerHistoryPresent(
+  history: PlannerHistory,
+  nextSnapshot: PlannerSnapshot,
+): PlannerHistory {
+  return {
+    ...history,
+    present: nextSnapshot,
+  };
+}
+
+export function getPlannerSnapshotSignature(snapshot: PlannerSnapshot): string {
+  return [
+    snapshot.sessions
+      .map(
+        (session) =>
+          `${session.id}:${session.slotId}:${session.order}:${session.sessionName}:${session.company}:${session.speaker}:${session.details}:${session.source}`,
+      )
+      .join("|"),
+    snapshot.slots
+      .map(
+        (slot) =>
+          `${slot.id}:${slot.order}:${slot.timeBlock}:${slot.label}:${slot.kind}`,
+      )
+      .join("|"),
+  ].join("||");
 }

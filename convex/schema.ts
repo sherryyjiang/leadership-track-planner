@@ -20,4 +20,11 @@ export default defineSchema({
     details: v.string(),
     source: v.union(v.literal("seed"), v.literal("user")),
   }).index("by_client_id", ["clientId"]),
+  slots: defineTable({
+    clientId: v.string(),
+    order: v.number(),
+    timeBlock: v.string(),
+    label: v.string(),
+    kind: v.union(v.literal("session"), v.literal("break")),
+  }).index("by_client_id", ["clientId"]),
 });

@@ -10,6 +10,7 @@
 
 import type * as messages from "../messages.js";
 import type * as sessions from "../sessions.js";
+import type * as slots from "../slots.js";
 
 import type {
   ApiFromModules,
@@ -20,6 +21,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   messages: typeof messages;
   sessions: typeof sessions;
+  slots: typeof slots;
 }>;
 
 /**
